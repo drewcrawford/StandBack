@@ -1,0 +1,13 @@
+(package
+  :name "StandBack"
+  :version "0.1"
+
+  :tasks {
+    :default {
+      :tool "atllbuild"
+      :sources ["src/**.swift"]
+      :name "StandBack"
+      :output-type "static-library"
+    }
+  }
+)

@@ -1,0 +1,11 @@
+dd {
+    margin-left: 30px;
+}
+
+code {
+    color: #29abe0;
+}
+
+code.descclassname {
+    color: rgba(41, 171, 224, 0.72);
+}

@@ -1,0 +1,22 @@
+stages:
+- test
+osx:
+    stage: test
+    script:
+      - atbuild
+      
+    tags:
+      - xc7
+      - openswift
+      - atbuild
+
+linux:
+    stage: test
+    script:
+      - apt-get update
+      - apt-get install atbuild -y
+      - atbuild
+
+    tags:
+      - autoscale-linux
+    image: drewcrawford/buildbase:latest
