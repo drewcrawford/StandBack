@@ -3,7 +3,7 @@
 
 # StandBack
 
-![StandBack](standback-small.png)
+![StandBack](art/standback-small.png)
 
 StandBack is a regular expression engine implementing the `egrep` (POSIX-extended) language.  It is cross-platform and has no dependencies.
 While `egrep` is a less popular language than PCRE, it is fully capable for basic programming tasks, and our API is *much* easier to use than Foundation's.
