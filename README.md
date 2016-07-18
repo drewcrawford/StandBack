@@ -8,6 +8,8 @@
 StandBack is a regular expression engine implementing the `egrep` (POSIX-extended) language.  It is cross-platform and has no dependencies.
 While `egrep` is a less popular language than PCRE, it is fully capable for basic programming tasks, and our API is *much* easier to use than Foundation's.
 
+Here's a sample to get started. For more information, see our [documentation](http://standback-docs.sealedabstract.com).
+
 
 ```swift
 let r = try! Regex(pattern: "class[[:space:]]+([[:alnum:]]+)[[:space:]]*:CarolineTest[[:space:]]*\\{")
