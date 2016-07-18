@@ -1,5 +1,5 @@
 [![Anarchy Tools compatible](https://img.shields.io/badge/Anarchy%20Tools-compatible-4BC51D.svg?style=flat)](http://anarchytools.org)
-![License:apache](https://img.shields.io/hexpm/l/plug.svg)]
+![License:apache](https://img.shields.io/hexpm/l/plug.svg)
 
 # StandBack
 
