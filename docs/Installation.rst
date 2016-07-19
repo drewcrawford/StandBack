@@ -14,3 +14,5 @@ Add this to your build.atpkg:
             }
           ]
 
+
+Make sure to link with :code:`StandBack.a`.
