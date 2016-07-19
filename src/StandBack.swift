@@ -178,6 +178,11 @@ public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
     public let start : Int
     /// The end of the match (utf8 encoding)
     public let end : Int
+
+    /// The length in UTF8 bytes of the match
+    public var length: Int {
+        return end - start
+    }
     
     ///The string we searched to generate this match
     public let underlyingString : String
