@@ -1,5 +1,8 @@
 [![Anarchy Tools compatible](https://img.shields.io/badge/Anarchy%20Tools-compatible-4BC51D.svg?style=flat)](http://anarchytools.org)
 ![License:apache](https://img.shields.io/hexpm/l/plug.svg)
+![Swift:3](https://img.shields.io/badge/Swift-3-blue.svg)
+![Platform:macOS](https://img.shields.io/badge/Platform-macOS-red.svg)
+![Platform:Linux](https://img.shields.io/badge/Platform-Linux-red.svg)
 
 # StandBack
 
