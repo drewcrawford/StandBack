@@ -168,9 +168,9 @@ private final class RegexImp {
 
 ///A match object.
 public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
-    /// The start of the match
+    /// The start of the match (utf8 encoding)
     public let start : Int
-    /// The end of the match
+    /// The end of the match (utf8 encoding)
     public let end : Int
     
     ///The string we searched to generate this match
