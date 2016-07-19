@@ -219,7 +219,9 @@ public class FindResultGenerator: IteratorProtocol {
     public func next() -> FindResultGenerator.Element? {
         let startPosition = lastStart + (lastMatch?.end ?? 0) + 1
         lastStart = startPosition
-        let proposedStartIndex = string.utf8.index(string.utf8.startIndex, offsetBy: startPosition, limitedBy: string.utf8.endIndex)!
+        guard let proposedStartIndex = string.utf8.index(string.utf8.startIndex, offsetBy: startPosition, limitedBy: string.utf8.endIndex) else {
+            return nil //index beyond range
+        }
         let abbreviatedString = String(string.utf8[proposedStartIndex..<string.utf8.endIndex])!
         let result = try! regex.findFirst(inString: abbreviatedString)
         lastMatch = result?.entireMatch
