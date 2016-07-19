@@ -152,12 +152,6 @@ public enum RegexError: ErrorProtocol {
 ///We use an inner class as an implementation detail.  It isn't actually mutable, but it's hard to convince Swift that.
 private final class RegexImp {
     private let regext: regex_t
-    ///Create a regex following the given pattern.
-    ///For regex syntax, consult the extended regular expression specification at http://pubs.opengroup.org/onlinepubs/7908799/xbd/re.html
-    ///For casual use, Boost has a particularly good guide: http://www.boost.org/doc/libs/1_54_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
-    ///- note: There are two levels of indirection here.  For Swift literals, Swift-level escaping is applied first (e.g.  `\\` -> `\`).  
-    ///  Therefore to escape through both systems, you may need `\\\\`.
-    ///  See Swift's documentation on this here https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/StringsAndCharacters.html
     init(pattern: String) throws {
         var lregext = regex_t()
         let result = regcomp(&lregext, pattern, REG_EXTENDED)
@@ -253,6 +247,13 @@ public class FindResultSequence: Sequence {
 ///A regular expression
 public struct Regex {
     private let regexImp : RegexImp
+    
+    ///Create a regex following the given pattern.
+    ///For regex syntax, consult the extended regular expression specification at http://pubs.opengroup.org/onlinepubs/7908799/xbd/re.html
+    ///For casual use, Boost has a particularly good guide: http://www.boost.org/doc/libs/1_54_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
+    ///- note: There are two levels of indirection here.  For Swift literals, Swift-level escaping is applied first (e.g.  `\\` -> `\`).  
+    ///  Therefore to escape through both systems, you may need `\\\\`.
+    ///  See Swift's documentation on this here https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/StringsAndCharacters.html
     public init(pattern: String) throws {
         regexImp = try RegexImp(pattern: pattern)
     }
