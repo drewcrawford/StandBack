@@ -322,4 +322,22 @@ public struct Regex {
     public func replaceAll(inString string: String, withNewString newString: String) -> String {
         return self.replaceAll(inString: string, usingClosure: {j in return newString})
     }
+
+    /// Replace the first match with another string
+    /// - parameter string: We use the `entireMatch` of this value
+    /// - parameter newString: We replace the `entireMatch` with thew new value
+    public func replaceFirst(inString string: String, withNewString newString: String) -> String {
+        var replaced = string
+        if let match = try! self.findFirst(inString: string) {
+            //take the part up the current match
+            var new_newString = String(replaced.utf8[replaced.utf8.startIndex ..< replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.start)])!
+            //take the new part
+            let newString = newString
+            new_newString += newString
+            //take the part after the current match
+            new_newString += String(replaced.utf8[replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.end) ..< replaced.utf8.endIndex])!
+            return new_newString
+        }
+        return replaced
+    }
 }
