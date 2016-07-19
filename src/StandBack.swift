@@ -277,4 +277,38 @@ public struct Regex {
     public func findAll(inString string: String) -> FindResultSequence {
         return FindResultSequence(regex: self, string: string)
     }
+
+    /// Replace all matches of a string by using a closure.  
+    /// This allows powerful searching without the need to do advanced string edit logic by hand.
+    /// - parameter string: The string in which to search.
+    /// - parameter closure: A closure that will be passed `FindResult`s.  Return the desired replacement value for each FindResult.
+    public func replaceAll(inString string: String, usingClosure closure: (FindResult) throws -> String) rethrows -> String {
+        var replaced = string
+        //For substitiutions of a different length than the source string, the string will change size as we read it
+        var offset = 0
+        for match in self.findAll(inString: string) {
+            //find existing length
+            let length = match.entireMatch.end - match.entireMatch.start
+
+            //take the part up the current match
+            var new_newString = String(replaced.utf8[replaced.utf8.startIndex ..< replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.start + offset)])!
+            //take the new part
+            let newString = try closure(match)
+            new_newString += newString
+            //take the part after the current match
+            new_newString += String(replaced.utf8[replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.end + offset) ..< replaced.utf8.endIndex])!
+            //calculate the new offset
+            offset += (length - newString.utf8.count)
+
+            replaced = new_newString
+        }
+        return replaced
+    }
+
+    /// Replace all matches of a regex with another string
+    /// - parameter string: We use the `entireMatch` of this value
+    /// - parameter newString: We replace the `entireMatch` with this new value
+    public func replaceAll(inString string: String, withNewString newString: String) -> String {
+        return self.replaceAll(inString: string, usingClosure: {j in return newString})
+    }
 }
