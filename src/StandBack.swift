@@ -23,7 +23,7 @@ import Darwin
 import Glibc
 #endif
 
-public enum RegexError: ErrorProtocol {
+public enum RegexError: Error {
     ///The regexec() function failed to match
     case NoMatch
     ///Invalid regular expression
