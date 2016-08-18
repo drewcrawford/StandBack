@@ -151,7 +151,7 @@ public enum RegexError: Error {
 
 ///We use an inner class as an implementation detail.  It isn't actually mutable, but it's hard to convince Swift that.
 private final class RegexImp {
-    private let regext: regex_t
+    fileprivate let regext: regex_t
     init(pattern: String) throws {
         var lregext = regex_t()
         let result = regcomp(&lregext, pattern, REG_EXTENDED)
@@ -179,7 +179,7 @@ public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
     ///The part of the string that matched this expression
     public var region: String {
         let utf8 = self.underlyingString.utf8
-        return String(utf8[utf8.index(utf8.startIndex, offsetBy: start)..<utf8.index(utf8.startIndex, offsetBy:end)])
+        return String(describing: utf8[utf8.index(utf8.startIndex, offsetBy: start)..<utf8.index(utf8.startIndex, offsetBy:end)])
     }
     private init?(start: Int, end: Int, underlyingString: String) {
         if start == -1 && end == -1 {return nil}
@@ -187,7 +187,7 @@ public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
         self.end = end
         self.underlyingString = underlyingString
     }
-    private init?(regmatch: regmatch_t, underlyingString: String) {
+    fileprivate init?(regmatch: regmatch_t, underlyingString: String) {
         self.init(start: Int(regmatch.rm_so), end: Int(regmatch.rm_eo), underlyingString: underlyingString)
     }
     public var description: String {
