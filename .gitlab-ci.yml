@@ -6,7 +6,7 @@ osx:
       - atbuild
       
     tags:
-      - xc7
+      - xcode8
       - openswift
       - atbuild
 
