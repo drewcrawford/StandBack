@@ -168,10 +168,15 @@ private final class RegexImp {
 
 ///A match object.
 public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
-    /// The start of the match
+    /// The start of the match (utf8 encoding)
     public let start : Int
-    /// The end of the match
+    /// The end of the match (utf8 encoding)
     public let end : Int
+
+    /// The length in UTF8 bytes of the match
+    public var length: Int {
+        return end - start
+    }
     
     ///The string we searched to generate this match
     public let underlyingString : String
@@ -219,7 +224,9 @@ public class FindResultGenerator: IteratorProtocol {
     public func next() -> FindResultGenerator.Element? {
         let startPosition = lastStart + (lastMatch?.end ?? 0) + 1
         lastStart = startPosition
-        let proposedStartIndex = string.utf8.index(string.utf8.startIndex, offsetBy: startPosition, limitedBy: string.utf8.endIndex)!
+        guard let proposedStartIndex = string.utf8.index(string.utf8.startIndex, offsetBy: startPosition, limitedBy: string.utf8.endIndex) else {
+            return nil //index beyond range
+        }
         let abbreviatedString = String(string.utf8[proposedStartIndex..<string.utf8.endIndex])!
         let result = try! regex.findFirst(inString: abbreviatedString)
         lastMatch = result?.entireMatch
@@ -240,6 +247,13 @@ public class FindResultSequence: Sequence {
 ///A regular expression
 public struct Regex {
     private let regexImp : RegexImp
+    
+    ///Create a regex following the given pattern.
+    ///For regex syntax, consult the extended regular expression specification at http://pubs.opengroup.org/onlinepubs/7908799/xbd/re.html
+    ///For casual use, Boost has a particularly good guide: http://www.boost.org/doc/libs/1_54_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
+    ///- note: There are two levels of indirection here.  For Swift literals, Swift-level escaping is applied first (e.g.  `\\` -> `\`).  
+    ///  Therefore to escape through both systems, you may need `\\\\`.
+    ///  See Swift's documentation on this here https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/StringsAndCharacters.html
     public init(pattern: String) throws {
         regexImp = try RegexImp(pattern: pattern)
     }
@@ -274,5 +288,57 @@ public struct Regex {
     /// If you need to iterate over these results several times, pass the return value to an `Array` constructor.  Then we will find all the results right away and place them into the array where you can work with them at your leisure.
     public func findAll(inString string: String) -> FindResultSequence {
         return FindResultSequence(regex: self, string: string)
+    }
+
+    /// Replace all matches of a string by using a closure.  
+    /// This allows powerful searching without the need to do advanced string edit logic by hand.
+    /// - parameter string: The string in which to search.
+    /// - parameter closure: A closure that will be passed `FindResult`s.  Return the desired replacement value for each FindResult.
+    public func replaceAll(inString string: String, usingClosure closure: (FindResult) throws -> String) rethrows -> String {
+        var replaced = string
+        //For substitiutions of a different length than the source string, the string will change size as we read it
+        var offset = 0
+        for match in self.findAll(inString: string) {
+            //find existing length
+            let length = match.entireMatch.end - match.entireMatch.start
+
+            //take the part up the current match
+            var new_newString = String(replaced.utf8[replaced.utf8.startIndex ..< replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.start + offset)])!
+            //take the new part
+            let newString = try closure(match)
+            new_newString += newString
+            //take the part after the current match
+            new_newString += String(replaced.utf8[replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.end + offset) ..< replaced.utf8.endIndex])!
+            //calculate the new offset
+            offset += (length - newString.utf8.count)
+
+            replaced = new_newString
+        }
+        return replaced
+    }
+
+    /// Replace all matches of a regex with another string
+    /// - parameter string: We use the `entireMatch` of this value
+    /// - parameter newString: We replace the `entireMatch` with this new value
+    public func replaceAll(inString string: String, withNewString newString: String) -> String {
+        return self.replaceAll(inString: string, usingClosure: {j in return newString})
+    }
+
+    /// Replace the first match with another string
+    /// - parameter string: We use the `entireMatch` of this value
+    /// - parameter newString: We replace the `entireMatch` with thew new value
+    public func replaceFirst(inString string: String, withNewString newString: String) -> String {
+        var replaced = string
+        if let match = try! self.findFirst(inString: string) {
+            //take the part up the current match
+            var new_newString = String(replaced.utf8[replaced.utf8.startIndex ..< replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.start)])!
+            //take the new part
+            let newString = newString
+            new_newString += newString
+            //take the part after the current match
+            new_newString += String(replaced.utf8[replaced.utf8.index(replaced.utf8.startIndex, offsetBy: match.entireMatch.end) ..< replaced.utf8.endIndex])!
+            return new_newString
+        }
+        return replaced
     }
 }

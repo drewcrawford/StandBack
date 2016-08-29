@@ -20,3 +20,19 @@ linux:
     tags:
       - autoscale-linux
     image: drewcrawford/buildbase:latest
+
+docs:
+    stage: test
+    script:
+      - cd docs
+      - make html
+      - make dashdoc
+
+    artifacts:
+      paths:
+        - docs/_build/html
+        - docs/_build/StandBack.docset
+
+    tags:
+      - autoscale-linux
+    image: drewcrawford/anarchy-sphinx:latest

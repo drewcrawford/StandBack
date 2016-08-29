@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
-PROJECT_NAME=Caroline
+PROJECT_NAME=StandBack
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
