@@ -259,7 +259,6 @@ public struct Regex {
     }
     ///Finds the first match in the given string.
     public func findFirst(inString string: String) throws -> FindResult?   {
-        self.regexImp.regext.re_nsub
         var weDontMutateThis = self.regexImp.regext
         var matches: [regmatch_t] = [regmatch_t](repeating: regmatch_t(), count: self.regexImp.regext.re_nsub + 1)
         let result = regexec(&weDontMutateThis, string, matches.count, &matches, 0)
