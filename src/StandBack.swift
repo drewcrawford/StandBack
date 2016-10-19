@@ -192,8 +192,8 @@ public struct Match : CustomStringConvertible, CustomDebugStringConvertible {
         self.end = end
         self.underlyingString = underlyingString
     }
-    fileprivate init?(regmatch: regmatch_t, underlyingString: String) {
-        self.init(start: Int(regmatch.rm_so), end: Int(regmatch.rm_eo), underlyingString: underlyingString)
+    fileprivate init?(regmatch: regmatch_t, underlyingString: String, offset: Int) {
+        self.init(start: Int(regmatch.rm_so + offset), end: Int(regmatch.rm_eo + offset), underlyingString: underlyingString)
     }
     public var description: String {
         return region
@@ -222,13 +222,13 @@ public class FindResultGenerator: IteratorProtocol {
     let string: String
     let regex: Regex
     public func next() -> FindResultGenerator.Element? {
-        let startPosition = lastStart + (lastMatch?.end ?? 0) + 1
+        let startPosition = (lastMatch?.end ?? 0) + 1
         lastStart = startPosition
         guard let proposedStartIndex = string.utf8.index(string.utf8.startIndex, offsetBy: startPosition, limitedBy: string.utf8.endIndex) else {
             return nil //index beyond range
         }
         let abbreviatedString = String(string.utf8[proposedStartIndex..<string.utf8.endIndex])!
-        let result = try! regex.findFirst(inString: abbreviatedString)
+        let result = try! regex.findFirst(inString: abbreviatedString, prefixSize: startPosition, entireString: string)
         lastMatch = result?.entireMatch
         return result
     }
@@ -257,8 +257,10 @@ public struct Regex {
     public init(pattern: String) throws {
         regexImp = try RegexImp(pattern: pattern)
     }
-    ///Finds the first match in the given string.
-    public func findFirst(inString string: String) throws -> FindResult?   {
+
+    ///- parameter prefixSize: If you are searching a substring, pass a non-zero value here to get appropriate match groups
+    ///- parameter entireString: If you are searching a substring, pass the entire string here to get appropriate match groups
+    fileprivate func findFirst(inString string: String, prefixSize: Int, entireString: String) throws -> FindResult?   {
         var weDontMutateThis = self.regexImp.regext
         var matches: [regmatch_t] = [regmatch_t](repeating: regmatch_t(), count: self.regexImp.regext.re_nsub + 1)
         let result = regexec(&weDontMutateThis, string, matches.count, &matches, 0)
@@ -274,10 +276,14 @@ public struct Regex {
         }
         var swiftMatches: [Match?] = []
         for m in matches [1..<matches.count]{
-            let swiftMatch = Match(regmatch: m, underlyingString: string)
+            let swiftMatch = Match(regmatch: m, underlyingString: entireString, offset: prefixSize)
             swiftMatches.append(swiftMatch)
         }
-        return FindResult(entireMatch: Match(regmatch: matches[0], underlyingString: string)!, groups: swiftMatches)
+        return FindResult(entireMatch: Match(regmatch: matches[0], underlyingString: entireString, offset: prefixSize)!, groups: swiftMatches)
+    }
+    ///Finds the first match in the given string.
+    public func findFirst(inString string: String) throws -> FindResult?   {
+        return try findFirst(inString: string, prefixSize: 0, entireString: string)
     }
 
     /// Find all matches in the sequence.
