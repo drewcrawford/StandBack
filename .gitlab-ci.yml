@@ -42,7 +42,7 @@ deploydocs:
   stage: deploy
   image: python:latest
   dependencies:
-    - documentation
+    - docs
   script:
   - pip install awscli
   - aws s3 cp docs/_build/html/ s3://$DOC_BUCKET_NAME/ --recursive --acl "public-read"
